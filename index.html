@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peces Demersales · Santa Elena · Octubre 2023 — Servidor de Estudio</title>
+<style>
+:root{
+  --bg:#06161f; --bg2:#0a2230; --card:#0f2f42; --card2:#143a51;
+  --line:#1d4d68; --txt:#e8f4f8; --muted:#93b3c4;
+  --accent:#2ec4b6; --accent2:#ffb703; --ok:#38d39f; --bad:#ff6b6b;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+  background:radial-gradient(1200px 600px at 20% -10%,#0d3346 0%,var(--bg) 55%) fixed;
+  color:var(--txt); min-height:100vh; line-height:1.5;
+}
+a{color:var(--accent)}
+header{padding:22px 20px 0; max-width:1150px; margin:0 auto;}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{
+  width:46px;height:46px;border-radius:14px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--accent),#1b7f9c);
+  display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow);
+}
+h1{font-size:clamp(18px,2.4vw,25px);margin:0;letter-spacing:.3px}
+.sub{color:var(--muted);font-size:13px;margin-top:2px}
+nav{
+  display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 0;
+  border-bottom:1px solid var(--line);
+}
+.tab{
+  background:transparent;border:1px solid transparent;border-bottom:none;
+  color:var(--muted);padding:10px 16px;border-radius:10px 10px 0 0;
+  cursor:pointer;font-size:14px;font-weight:600;transition:.2s;
+}
+.tab:hover{color:var(--txt);background:rgba(46,196,182,.08)}
+.tab.active{color:var(--txt);background:var(--card);border-color:var(--line);border-bottom:1px solid var(--card);margin-bottom:-1px}
+main{max-width:1150px;margin:0 auto;padding:22px 20px 70px}
+.view{display:none;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.card{
+  background:linear-gradient(180deg,var(--card),var(--card2));
+  border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);
+}
+.kpi .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.kpi .val{font-size:27px;font-weight:800;margin:6px 0 2px;color:var(--accent)}
+.kpi .hint{font-size:12px;color:var(--muted)}
+h2{font-size:19px;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+h2::before{content:'';width:5px;height:19px;border-radius:3px;background:var(--accent)}
+h3{font-size:15px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.two{display:grid;gap:16px;grid-template-columns:1.35fr 1fr}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.bar-row{display:grid;grid-template-columns:150px 1fr 82px;gap:10px;align-items:center;margin-bottom:9px;font-size:13px}
+@media(max-width:560px){.bar-row{grid-template-columns:110px 1fr 70px;font-size:12px}}
+.bar-track{background:rgba(255,255,255,.07);border-radius:8px;height:16px;overflow:hidden}
+.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),#1b7f9c);transition:width .7s cubic-bezier(.2,.8,.3,1)}
+.bar-fill.gold{background:linear-gradient(90deg,var(--accent2),#e07b00)}
+.bar-val{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.donut{
+  width:180px;height:180px;border-radius:50%;position:relative;
+  background:conic-gradient(var(--accent) 0 11.42%, var(--accent2) 11.42% 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1), var(--shadow);
+}
+.donut::after{content:'';position:absolute;inset:26%;border-radius:50%;background:var(--card);box-shadow:0 0 0 1px var(--line);}
+.donut-center{position:absolute;inset:0;display:grid;place-items:center;z-index:2;text-align:center}
+.donut-center b{font-size:20px;display:block}
+.donut-center span{font-size:10px;color:var(--muted);letter-spacing:1px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:13px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07)}
+th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--accent)}
+tbody tr:hover{background:rgba(46,196,182,.07)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl-scroll{max-height:520px;overflow:auto;border-radius:12px}
+.tbl-scroll::-webkit-scrollbar{width:9px;height:9px}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+input[type=search],select{
+  background:var(--bg2);border:1px solid var(--line);color:var(--txt);
+  padding:10px 13px;border-radius:10px;font-size:14px;outline:none;width:100%;
+}
+input[type=search]:focus,select:focus{border-color:var(--accent)}
+.controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.controls > *{flex:1 1 190px}
+.btn{
+  background:linear-gradient(180deg,var(--accent),#1e9c93);color:#04222a;border:none;
+  padding:11px 20px;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer;
+  transition:.18s;box-shadow:0 6px 16px rgba(46,196,182,.25);font-family:inherit;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);box-shadow:none}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn.bad{background:linear-gradient(180deg,#ff8080,#c74848);color:#2a0505;box-shadow:0 6px 16px rgba(255,107,107,.2)}
+.btn.gold{background:linear-gradient(180deg,var(--accent2),#d98d00);color:#2b1a00;box-shadow:0 6px 16px rgba(255,183,3,.2)}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.flip{perspective:1400px;height:400px;margin:8px auto 0;max-width:640px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.8,.3,1);transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:20px;border:1px solid var(--line);padding:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(160deg,var(--card2),var(--card));box-shadow:var(--shadow);overflow:hidden;
+}
+.face.back{transform:rotateY(180deg);background:linear-gradient(160deg,#12495e,var(--card))}
+.face-img{
+  width:100%;height:170px;flex:0 0 auto;border-radius:14px;overflow:hidden;
+  margin-bottom:12px;background:rgba(0,0,0,.25);display:grid;place-items:center;
+}
+.face-img img{width:100%;height:100%;object-fit:cover;display:block}
+.face .tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.face .big{font-size:clamp(20px,3.4vw,30px);font-weight:800;line-height:1.2}
+.face .sci{font-size:clamp(16px,2.7vw,23px);font-weight:700;font-style:italic;color:var(--accent);margin:6px 0}
+.face .meta{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.7}
+.face .hintflip{position:absolute;bottom:10px;font-size:11px;color:var(--muted);letter-spacing:1px}
+.pill{display:inline-block;background:rgba(46,196,182,.14);border:1px solid rgba(46,196,182,.35);
+  color:var(--accent);padding:3px 11px;border-radius:99px;font-size:12px;font-weight:700;margin:3px}
+.pill.gold{background:rgba(255,183,3,.14);border-color:rgba(255,183,3,.4);color:var(--accent2)}
+.q-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;color:var(--muted)}
+.progress{height:8px;background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .35s}
+.q-img{max-width:340px;max-height:230px;border-radius:14px;margin:0 auto 18px;display:block;border:1px solid var(--line);object-fit:cover;width:100%}
+.q-text{font-size:clamp(16px,2.3vw,21px);font-weight:700;margin-bottom:20px;line-height:1.45}
+.opts{display:grid;gap:11px}
+.opt{
+  background:rgba(255,255,255,.04);border:1.5px solid var(--line);color:var(--txt);
+  padding:14px 17px;border-radius:12px;text-align:left;font-size:15px;cursor:pointer;
+  transition:.16s;display:flex;gap:12px;align-items:center;font-family:inherit;
+}
+.opt:hover:not(:disabled){border-color:var(--accent);background:rgba(46,196,182,.09);transform:translateX(3px)}
+.opt .k{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:12px;font-weight:800;flex:0 0 auto}
+.opt.correct{border-color:var(--ok);background:rgba(56,211,159,.16)}
+.opt.correct .k{background:var(--ok);color:#04231a}
+.opt.wrong{border-color:var(--bad);background:rgba(255,107,107,.14)}
+.opt.wrong .k{background:var(--bad);color:#2a0505}
+.opt:disabled{cursor:default}
+.explain{margin-top:16px;padding:13px 16px;border-radius:12px;font-size:14px;
+  background:rgba(46,196,182,.09);border-left:4px solid var(--accent);color:#cfeaf1;}
+.score-ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;position:relative}
+.score-ring .inner{width:132px;height:132px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center}
+.score-ring b{font-size:34px;display:block}
+.score-ring span{font-size:11px;color:var(--muted);letter-spacing:1px}
+.empty{text-align:center;color:var(--muted);padding:48px 20px;font-size:14px}
+.empty .big{font-size:46px;display:block;margin-bottom:12px;opacity:.6}
+.hist-item{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px;flex-wrap:wrap}
+.hist-item:last-child{border-bottom:none}
+.badge{padding:2px 10px;border-radius:99px;font-size:11px;font-weight:800}
+.badge.g{background:rgba(56,211,159,.18);color:var(--ok)}
+.badge.y{background:rgba(255,183,3,.18);color:var(--accent2)}
+.badge.r{background:rgba(255,107,107,.18);color:var(--bad)}
+.note{font-size:12.5px;color:var(--muted);background:rgba(255,183,3,.07);border-left:3px solid var(--accent2);padding:11px 14px;border-radius:9px;margin-top:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);
+  padding:7px 14px;border-radius:99px;font-size:13px;cursor:pointer;font-weight:600;transition:.16s}
+.chip:hover{color:var(--txt);border-color:var(--accent)}
+.chip.on{background:rgba(46,196,182,.16);border-color:var(--accent);color:var(--accent)}
+.drop-zone{
+  border:2px dashed var(--line);border-radius:16px;padding:32px 20px;text-align:center;
+  transition:.2s;cursor:pointer;background:rgba(46,196,182,.04);margin-bottom:18px;
+}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(46,196,182,.12);transform:scale(1.01)}
+.drop-zone .big{font-size:38px;display:block;margin-bottom:8px}
+.drop-zone .t{font-weight:700;font-size:15px;margin-bottom:4px}
+.drop-zone .s{font-size:12.5px;color:var(--muted)}
+.img-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.img-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;display:flex;flex-direction:column;transition:.18s;
+}
+.img-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.img-card .thumb{width:100%;height:130px;background:#0a1f2b;display:block;object-fit:cover}
+.img-card .body{padding:11px 12px;flex:1;display:flex;flex-direction:column;gap:3px}
+.img-card .nc{font-weight:800;font-size:13.5px}
+.img-card .nk{font-size:11.5px;font-style:italic;color:var(--accent);word-break:break-word}
+.img-card .acts{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap}
+.thumb-cell img{width:44px;height:34px;object-fit:cover;border-radius:6px;display:block;background:#0a1f2b}
+.upload-badge{
+  position:absolute;top:8px;right:8px;background:var(--ok);color:#04231a;
+  font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.5px;
+}
+.img-card .thumb-wrap{position:relative}
+.mini-stat{font-size:11px;color:var(--muted);margin-top:2px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:26px 20px 40px;border-top:1px solid var(--line);margin-top:30px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">🐟</div>
+    <div>
+      <h1>Peces Demersales · Santa Elena · Octubre 2023</h1>
+      <div class="sub">Servidor de estudio interactivo — IPIAP · Programa Pesca Artesanal</div>
+    </div>
+  </div>
+  <nav>
+    <button class="tab active" data-view="resumen">📊 Resumen</button>
+    <button class="tab" data-view="explorar">🔎 Explorador</button>
+    <button class="tab" data-view="tarjetas">🃏 Tarjetas</button>
+    <button class="tab" data-view="imagenes">📷 Imágenes</button>
+    <button class="tab" data-view="quiz">🎯 Quiz</button>
+    <button class="tab" data-view="resultados">🏆 Resultados</button>
+  </nav>
+</header>
+
+<main>
+  <section class="view active" id="view-resumen"></section>
+  <section class="view" id="view-explorar">
+    <div class="card">
+      <h2>Explorador de especies</h2>
+      <div class="controls">
+        <input type="search" id="buscar" placeholder="Buscar por nombre común o científico…">
+        <select id="orden">
+          <option value="t-desc">Total (mayor → menor)</option>
+          <option value="t-asc">Total (menor → mayor)</option>
+          <option value="c-asc">Nombre común (A → Z)</option>
+          <option value="k-asc">Nombre científico (A → Z)</option>
+          <option value="a-desc">Desembarque en Anconcito</option>
+          <option value="s-desc">Desembarque en Santa Rosa</option>
+        </select>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Foto</th><th>Nombre común</th><th>Nombre científico</th>
+              <th class="num">Anconcito (t)</th><th class="num">Santa Rosa (t)</th>
+              <th class="num">Total (t)</th><th class="num">%</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-especies"></tbody>
+        </table>
+      </div>
+      <div class="note" id="nota-explorar"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-tarjetas">
+    <div class="card">
+      <h2>Tarjetas de estudio</h2>
+      <div class="controls">
+        <select id="deck">
+          <option value="todas">Todas las especies (52)</option>
+          <option value="top10">Top 10 por volumen</option>
+          <option value="top20">Top 20 por volumen</option>
+          <option value="con-foto">Solo con foto subida</option>
+          <option value="falladas">Solo las que fallé</option>
+          <option value="nuevas">Solo las no vistas</option>
+        </select>
+        <select id="dir">
+          <option value="c2k">Común → Científico</option>
+          <option value="k2c">Científico → Común</option>
+          <option value="i2c">📷 Imagen → Común</option>
+          <option value="i2k">📷 Imagen → Científico</option>
+        </select>
+        <button class="btn ghost" id="reiniciar-tarjetas">🔄 Reiniciar progreso</button>
+      </div>
+
+      <div class="flip" id="flipcard">
+        <div class="flip-inner">
+          <div class="face front">
+            <div class="face-img" id="front-img"></div>
+            <div class="tag" id="tag-front">Nombre común</div>
+            <div class="big" id="front-main">—</div>
+            <div class="meta" id="front-meta"></div>
+            <div class="hintflip">clic para voltear</div>
+          </div>
+          <div class="face back">
+            <div class="face-img" id="back-img"></div>
+            <div class="tag">Respuesta</div>
+            <div class="sci" id="back-main">—</div>
+            <div class="meta" id="back-meta"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn bad" id="mk-fail">✗ No la sabía</button>
+        <button class="btn ghost" id="mk-flip">↻ Voltear</button>
+        <button class="btn" id="mk-ok">✓ La sabía</button>
+      </div>
+      <div class="q-head" style="justify-content:center;margin-top:18px" id="deck-status"></div>
+      <div class="note">Atajos: <b>Espacio</b> voltea · <b>→</b> la sabía · <b>←</b> no la sabía</div>
+    </div>
+  </section>
+
+  <section class="view" id="view-imagenes">
+    <div class="card" style="margin-bottom:16px">
+      <h2>Biblioteca de imágenes</h2>
+      <div class="grid kpis" style="margin-bottom:16px" id="img-kpis"></div>
+
+      <div class="drop-zone" id="drop-zone">
+        <span class="big">📷</span>
+        <div class="t">Arrastra varias fotos aquí o haz clic para seleccionarlas</div>
+        <div class="s">
+          Se emparejan automáticamente por nombre de archivo (ej. <code>Merluccius_gayi.jpg</code>,
+          <code>Hemanthias signifer.png</code>, <code>merluza.jpg</code>).<br>
+          También puedes subirlas una a una con el botón de cada tarjeta.
+        </div>
+        <input type="file" id="input-masivo" accept="image/*" multiple style="display:none">
+      </div>
+
+      <div class="controls">
+        <input type="search" id="buscar-img" placeholder="Buscar especie…">
+        <select id="filtro-img">
+          <option value="todas">Todas</option>
+          <option value="con">Solo con foto</option>
+          <option value="sin">Solo sin foto</option>
+          <option value="top">Top 15 por volumen</option>
+        </select>
+      </div>
+
+      <div class="img-grid" id="img-grid"></div>
+
+      <div class="note">
+        💾 Las fotos se guardan <b>comprimidas</b> en tu navegador (máx. 500 px de ancho, JPEG). No se suben a ningún servidor.
+        El progreso se conserva entre sesiones en este mismo dispositivo.
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn ghost" id="btn-borrar-todas-img">🗑 Borrar todas las fotos</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-quiz">
+    <div class="card" id="quiz-setup">
+      <h2>Configurar quiz</h2>
+      <h3>Modo</h3>
+      <div class="chips" id="chips-modo">
+        <div class="chip on" data-modo="mixto">🎲 Mixto</div>
+        <div class="chip" data-modo="nombres">🔬 Nombres científicos</div>
+        <div class="chip" data-modo="datos">📈 Cifras, puertos y flota</div>
+        <div class="chip" data-modo="imagen">📷 Identificación visual</div>
+      </div>
+      <h3>Número de preguntas</h3>
+      <div class="chips" id="chips-largo">
+        <div class="chip" data-largo="5">5</div>
+        <div class="chip on" data-largo="10">10</div>
+        <div class="chip" data-largo="15">15</div>
+        <div class="chip" data-largo="20">20</div>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn" id="btn-iniciar">▶ Iniciar quiz</button>
+      </div>
+      <div class="note">Si no has subido fotos, el modo visual usará siluetas placeholder. El puntaje y errores se guardan al finalizar.</div>
+    </div>
+
+    <div class="card" id="quiz-play" style="display:none">
+      <div class="q-head">
+        <span id="q-counter">Pregunta 1 / 10</span>
+        <span id="q-cat" class="pill">—</span>
+        <span id="q-score">✔ 0 &nbsp;·&nbsp; ✘ 0</span>
+      </div>
+      <div class="progress"><i id="q-bar"></i></div>
+      <div id="q-img-wrap"></div>
+      <div class="q-text" id="q-text">—</div>
+      <div class="opts" id="q-opts"></div>
+      <div class="explain" id="q-explain" style="display:none"></div>
+      <div class="btn-row">
+        <button class="btn" id="btn-next" style="display:none">Siguiente →</button>
+        <button class="btn ghost" id="btn-abort">Salir</button>
+      </div>
+    </div>
+
+    <div class="card" id="quiz-done" style="display:none"></div>
+  </section>
+
+  <section class="view" id="view-resultados"></section>
+</main>
+
+<footer>
+  Datos: <b>IPIAP — Reporte Pesquero, Provincia de Santa Elena, octubre 2023</b><br>
+  Elaborado por MSc. Enrique Laaz · Unidad de Recursos Bentónicos Demersales y Agua Dulce/Embalses<br>
+  <span style="opacity:.7">Herramienta de estudio — datos e imágenes guardados localmente en tu navegador.</span>
+</footer>
+
+<script>
+/* =========================================================
+   1. DATOS DEL REPORTE
+   ========================================================= */
+const ESPECIES = [
+ {c:"Roncador trompudo", k:"Anisotremus interruptus", a:0,    s:0.62,  t:0.62,  p:0.08},
+ {c:"Bagre colorado",    k:"Bagre panamensis",        a:0,    s:0.91,  t:0.91,  p:0.12},
+ {c:"Rojito",            k:"Baldwinella eos",         a:0,    s:0.72,  t:0.72,  p:0.09},
+ {c:"Corvina de roca",   k:"Brotula clarkae",         a:17.33,s:1.06,  t:18.39, p:2.42},
+ {c:"Chilindrina",       k:"Brotula ordwayi",         a:0.33, s:1.36,  t:1.70,  p:0.22},
+ {c:"Palma",             k:"Calamus brachysomus",     a:0,    s:1.46,  t:1.46,  p:0.19},
+ {c:"Cabezudo",          k:"Caulolatilus affinis",    a:2.77, s:0.45,  t:3.22,  p:0.42},
+ {c:"Robalo armado",     k:"Centropomus armatus",     a:0,    s:0.30,  t:0.30,  p:0.04},
+ {c:"Robalito",          k:"Centropomus robalito",    a:2.44, s:3.28,  t:5.72,  p:0.75},
+ {c:"Castaña",           k:"Chromis intercrusma",     a:0,    s:0.10,  t:0.10,  p:0.01},
+ {c:"Corvina",           k:"Cynoscion albus",         a:0,    s:1.02,  t:1.02,  p:0.13},
+ {c:"Mojarra",           k:"Diapertus peruvianus",    a:0,    s:0.40,  t:0.40,  p:0.05},
+ {c:"Camotillo",         k:"Diplectrum maximum",      a:0,    s:0.45,  t:0.45,  p:0.06},
+ {c:"Morena pecosa",     k:"Echidna nocturna",        a:0,    s:0.66,  t:0.66,  p:0.09},
+ {c:"Corvina",           k:"Elattarchus archidium",   a:0.24, s:0.16,  t:0.40,  p:0.05},
+ {c:"Cojinoba",          k:"Eupreopocaranx dorsalis", a:0.05, s:0,     t:0.05,  p:0.01},
+ {c:"Roncador rayado",   k:"Genyatremus dovii",       a:0,    s:0.11,  t:0.11,  p:0.01},
+ {c:"Mojarra",           k:"Gerres simillimus",       a:0,    s:0.15,  t:0.15,  p:0.02},
+ {c:"Roncador",          k:"Haemulon steindachneri",  a:0,    s:0.13,  t:0.13,  p:0.02},
+ {c:"Rabijunco",         k:"Hemanthias peruanus",     a:0,    s:1.64,  t:1.64,  p:0.21},
+ {c:"Rabijunco",         k:"Hemanthias signifer",     a:0,    s:348.89,t:348.89,p:45.82},
+ {c:"Coluna",            k:"Lepophidium negropinna",  a:0,    s:0.49,  t:0.49,  p:0.06},
+ {c:"Berrugate",         k:"Lobotes pacificus",       a:0,    s:0.33,  t:0.33,  p:0.04},
+ {c:"Pargo",             k:"Lutjanus argentiventris", a:0,    s:0.33,  t:0.33,  p:0.04},
+ {c:"Pargo lunarejo",    k:"Lutjanus guttatus",       a:0.58, s:0.44,  t:1.02,  p:0.13},
+ {c:"Merluza",           k:"Merluccius gayi",         a:5.98, s:215.53,t:221.51,p:29.09},
+ {c:"Corvinón / torno",  k:"Micropogonias altipinnis",a:0,    s:2.10,  t:2.10,  p:0.28},
+ {c:"Lisa",              k:"Mugil cephalus",          a:3.88, s:3.08,  t:6.96,  p:0.91},
+ {c:"Anguila moteada",   k:"Myrichthys tigrinus",     a:0,    s:0.11,  t:0.11,  p:0.01},
+ {c:"Anguila",           k:"Ophichthus remiger",      a:0,    s:5.80,  t:5.80,  p:0.76},
+ {c:"Teniente",          k:"Orthopristis chalcea",    a:0.79, s:1.76,  t:2.55,  p:0.33},
+ {c:"Perela",            k:"Paralabrax callaensis",   a:17.84,s:9.06,  t:26.90, p:3.53},
+ {c:"Perela",            k:"Paralabrax humeralis",    a:11.43,s:59.16, t:70.58, p:9.27},
+ {c:"Selemba",           k:"Paranthias colonus",      a:0.17, s:0.07,  t:0.25,  p:0.03},
+ {c:"Leonora",           k:"Parapsettus panamensis",  a:0,    s:1.46,  t:1.46,  p:0.19},
+ {c:"Camiseta rayada",   k:"Pareques lanfeari",       a:0.24, s:0.15,  t:0.39,  p:0.05},
+ {c:"Pámpano",           k:"Peprilus medius",         a:1.21, s:0.45,  t:1.66,  p:0.22},
+ {c:"Lechuza",           k:"Pontinus sierra",         a:0.49, s:3.39,  t:3.87,  p:0.51},
+ {c:"Gallineta",         k:"Prionotus stephanophrys", a:0.49, s:0.09,  t:0.58,  p:0.08},
+ {c:"Pez sol",           k:"Pristigenys serrula",     a:0,    s:0.28,  t:0.28,  p:0.04},
+ {c:"Rojito",            k:"Pronotogrammus multifasciatus", a:0, s:2.40, t:2.40, p:0.31},
+ {c:"Pargo blanco",      k:"Rhencus panamensis",      a:0.56, s:0.40,  t:0.96,  p:0.13},
+ {c:"Pez loro",          k:"Scarus perrico",          a:0,    s:0.69,  t:0.69,  p:0.09},
+ {c:"Brujo",             k:"Scorpaena afuera",        a:0.10, s:0.21,  t:0.31,  p:0.04},
+ {c:"Brujo",             k:"Scorpaena mystes",        a:0.22, s:0.81,  t:1.03,  p:0.14},
+ {c:"Cara de caballo",   k:"Selene brevoretti",       a:0,    s:0.60,  t:0.60,  p:0.08},
+ {c:"Carita",            k:"Selene orstedii",         a:0,    s:0.21,  t:0.21,  p:0.03},
+ {c:"Carita",            k:"Selene peruviana",        a:3.24, s:2.29,  t:5.53,  p:0.73},
+ {c:"Camotillo negro",   k:"Serranus huascarili",     a:0,    s:1.70,  t:1.70,  p:0.22},
+ {c:"Picuda",            k:"Sphyraena ensis",         a:0,    s:9.24,  t:9.24,  p:1.21},
+ {c:"Corvina rabo amarillo", k:"Umbrina xanti",       a:2.32, s:1.63,  t:3.95,  p:0.52},
+ {c:"Ojón / olloco",     k:"Xenichthys xanti",        a:0.39, s:0.20,  t:0.59,  p:0.08}
+];
+
+const META = {
+  total: 761.42, anconcito: 86.92, santaRosa: 674.50,
+  pctAnconcito: 11.42, pctSantaRosa: 88.58, especies: ESPECIES.length,
+  flota: [
+    {puerto:"Anconcito", tipo:"Fibra de vidrio", arte:"Espinel de fondo", n:25},
+    {puerto:"Anconcito", tipo:"Fibra de vidrio", arte:"Enmalle de fondo", n:30},
+    {puerto:"Santa Rosa", tipo:"Fibra de vidrio", arte:"Línea de mano", n:40},
+    {puerto:"Santa Rosa", tipo:"Fibra de vidrio", arte:"Enmalle de fondo", n:15},
+    {puerto:"Santa Rosa", tipo:"Fibra de vidrio", arte:"Espinel de fondo", n:10}
+  ]
+};
+
+const TRIVIA = [
+ {cat:"Cifras clave", p:"¿Cuál fue el desembarque total estimado de peces demersales en Santa Elena en octubre de 2023?",
+  o:["761,42 t","674,50 t","348,89 t","86,92 t"], c:"761,42 t",
+  e:"El reporte estima 761,42 t de desembarque total de peces demersales."},
+ {cat:"Puertos", p:"¿En qué puerto pesquero se registró el mayor desembarque?",
+  o:["Santa Rosa","Anconcito","Ambos por igual","No se especifica"], c:"Santa Rosa",
+  e:"Santa Rosa registró 674,50 t, equivalentes al 88,58 % del total."},
+ {cat:"Puertos", p:"¿Cuántas toneladas se desembarcaron en el puerto de Anconcito?",
+  o:["86,92 t","674,50 t","761,42 t","221,51 t"], c:"86,92 t",
+  e:"Anconcito aportó 86,92 t, el 11,42 % del desembarque total."},
+ {cat:"Puertos", p:"¿Qué porcentaje del desembarque total representó Santa Rosa?",
+  o:["88,58 %","11,42 %","45,82 %","29,09 %"], c:"88,58 %",
+  e:"Santa Rosa: 88,58 %; Anconcito: 11,42 %."},
+ {cat:"Cifras clave", p:"¿Cuál fue la especie con mayor desembarque?",
+  o:["Hemanthias signifer (rabijunco)","Merluccius gayi (merluza)","Paralabrax humeralis (perela)","Sphyraena ensis (picuda)"],
+  c:"Hemanthias signifer (rabijunco)",
+  e:"El rabijunco (Hemanthias signifer) sumó 348,89 t, el 45,82 % del total."},
+ {cat:"Cifras clave", p:"¿Qué porcentaje del desembarque representó el rabijunco (Hemanthias signifer)?",
+  o:["45,82 %","29,09 %","9,27 %","11,42 %"], c:"45,82 %",
+  e:"348,89 t sobre 761,42 t = 45,82 %."},
+ {cat:"Cifras clave", p:"¿Qué porcentaje del desembarque representó la merluza (Merluccius gayi)?",
+  o:["29,09 %","45,82 %","9,27 %","3,53 %"], c:"29,09 %",
+  e:"221,51 t sobre 761,42 t = 29,09 %."},
+ {cat:"Cifras clave", p:"¿Cuántas toneladas de merluza (Merluccius gayi) se desembarcaron?",
+  o:["221,51 t","348,89 t","215,53 t","70,58 t"], c:"221,51 t",
+  e:"Merluza: 5,98 t en Anconcito + 215,53 t en Santa Rosa = 221,51 t."},
+ {cat:"Cifras clave", p:"¿Cuál fue la tercera especie más desembarcada?",
+  o:["Paralabrax humeralis (perela)","Paralabrax callaensis (perela)","Brotula clarkae (corvina de roca)","Sphyraena ensis (picuda)"],
+  c:"Paralabrax humeralis (perela)",
+  e:"Perela (Paralabrax humeralis): 70,58 t (9,27 %), detrás del rabijunco y la merluza."},
+ {cat:"Cifras clave", p:"¿Cuál fue la especie más desembarcada en Santa Rosa?",
+  o:["Hemanthias signifer (rabijunco)","Merluccius gayi (merluza)","Paralabrax humeralis (perela)","Sphyraena ensis (picuda)"],
+  c:"Hemanthias signifer (rabijunco)",
+  e:"En Santa Rosa el rabijunco aportó 348,89 t."},
+ {cat:"Cifras clave", p:"¿Cuántas especies aparecen registradas en la tabla de desembarque?",
+  o:["52","45","38","61"], c:"52",
+  e:"La tabla reporta 52 registros de especies."},
+ {cat:"Cifras clave", p:"¿Qué especie registró 9,24 t de desembarque?",
+  o:["Sphyraena ensis (picuda)","Mugil cephalus (lisa)","Ophichthus remiger (anguila)","Selene peruviana (carita)"],
+  c:"Sphyraena ensis (picuda)",
+  e:"La picuda (Sphyraena ensis) registró 9,24 t, todas en Santa Rosa."},
+ {cat:"Flota", p:"Según la Tabla 2, ¿cuántas embarcaciones de línea de mano operaron en Santa Rosa?",
+  o:["40","15","10","30"], c:"40",
+  e:"Santa Rosa: 40 de línea de mano, 15 de enmalle de fondo y 10 de espinel de fondo."},
+ {cat:"Flota", p:"En Anconcito, ¿qué arte de pesca utilizaron 30 embarcaciones?",
+  o:["Enmalle de fondo","Espinel de fondo","Línea de mano","Red de cerco"], c:"Enmalle de fondo",
+  e:"Anconcito: 25 embarcaciones con espinel de fondo y 30 con enmalle de fondo."},
+ {cat:"Flota", p:"¿Qué arte de pesca emplearon 10 embarcaciones en Santa Rosa?",
+  o:["Espinel de fondo","Enmalle de fondo","Línea de mano","Palangre de superficie"], c:"Espinel de fondo",
+  e:"Las 10 embarcaciones de Santa Rosa operaron con espinel de fondo."},
+ {cat:"Flota", p:"¿Qué tipo de embarcación se registró en la flota activa?",
+  o:["Fibra de vidrio","Madera","Acero naval","Mixta"], c:"Fibra de vidrio",
+  e:"Todas las embarcaciones activas reportadas eran de fibra de vidrio."},
+ {cat:"Flota", p:"¿Cuántas embarcaciones con espinel de fondo se registraron en total entre ambos puertos?",
+  o:["35","25","10","30"], c:"35",
+  e:"Anconcito 25 + Santa Rosa 10 = 35 embarcaciones con espinel de fondo."},
+ {cat:"Generalidades", p:"¿Qué institución elaboró el reporte?",
+  o:["IPIAP","INP","MAG","SRP"], c:"IPIAP",
+  e:"Instituto Público de Investigación de Acuicultura y Pesca (IPIAP)."},
+ {cat:"Generalidades", p:"¿A qué programa institucional corresponde el reporte?",
+  o:["Programa Pesca Artesanal","Programa de Acuacultura Rural","Programa de Camarón","Programa de Conservación Marina"],
+  c:"Programa Pesca Artesanal",
+  e:"Unidad de Recursos Bentónicos Demersales y Agua Dulce/Embalses — Programa Pesca Artesanal."},
+ {cat:"Generalidades", p:"¿Quién elaboró el reporte?",
+  o:["MSc. Enrique Laaz","MSc. Juan Cedeño","Ing. Ana Torres","Dr. Luis Flores"], c:"MSc. Enrique Laaz",
+  e:"Elaborado por MSc. Enrique Laaz (elaaz@institutopesca.gob.ec)."},
+ {cat:"Generalidades", p:"¿Qué tipo de información presenta el reporte?",
+  o:["Seguimiento de la pesca artesanal de peces demersales","Cultivo de camarón en piscinas","Exportaciones de atún","Turismo marino"],
+  c:"Seguimiento de la pesca artesanal de peces demersales",
+  e:"Proviene del seguimiento de la pesca artesanal de peces demersales en Santa Rosa y Anconcito."},
+ {cat:"Nombres científicos", p:"¿Cuál es el nombre científico de la merluza?",
+  o:["Merluccius gayi","Hemanthias signifer","Paralabrax humeralis","Sphyraena ensis"], c:"Merluccius gayi",
+  e:"Merluza = Merluccius gayi."},
+ {cat:"Nombres científicos", p:"¿Cuál es el nombre común de Brotula clarkae?",
+  o:["Corvina de roca","Chilindrina","Coluna","Berrugate"], c:"Corvina de roca",
+  e:"Brotula clarkae = corvina de roca (18,39 t)."},
+ {cat:"Nombres científicos", p:"¿Cuál es el nombre científico del rabijunco más abundante?",
+  o:["Hemanthias signifer","Hemanthias peruanus","Pronotogrammus multifasciatus","Baldwinella eos"],
+  c:"Hemanthias signifer",
+  e:"Hemanthias signifer = rabijunco (348,89 t). Hemanthias peruanus solo 1,64 t."},
+ {cat:"Nombres científicos", p:"¿Cuál es el nombre común de Ophichthus remiger?",
+  o:["Anguila","Anguila moteada","Morena pecosa","Coluna"], c:"Anguila",
+  e:"Ophichthus remiger = anguila (5,80 t). Myrichthys tigrinus = anguila moteada."}
+];
+
+/* =========================================================
+   2. UTILIDADES
+   ========================================================= */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const rnd = n => Math.floor(Math.random()*n);
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const fmt = n => n.toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
+const LS = {
+  get(k,d){ try{ const v = localStorage.getItem(k); return v===null? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ alert('No se pudo guardar en el navegador (espacio lleno).'); } }
+};
+const ORDEN = ["A","B","C","D"];
+const COMUN_COUNT = {};
+ESPECIES.forEach(e => COMUN_COUNT[e.c] = (COMUN_COUNT[e.c]||0)+1);
+const ORDENADAS = [...ESPECIES].sort((x,y)=>y.t-x.t);
+
+/* =========================================================
+   3. MÓDULO DE IMÁGENES
+   ========================================================= */
+const Imagenes = {
+  data: LS.get('demersales_imagenes', {}),
+  get(k){ return this.data[k] || null; },
+  has(k){ return !!this.data[k]; },
+  set(k, url){ this.data[k] = url; LS.set('demersales_imagenes', this.data); },
+  del(k){ delete this.data[k]; LS.set('demersales_imagenes', this.data); },
+  count(){ return Object.keys(this.data).length; },
+
+  placeholder(e){
+    const hue = hashStr(e.k) % 360;
+    const c1 = `hsl(${hue},58%,30%)`;
+    const c2 = `hsl(${(hue+45)%360},62%,18%)`;
+    const safe = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/>
+</linearGradient></defs>
+<rect width="220" height="140" fill="url(#g)"/>
+<g opacity="0.95">
+<path d="M62 72 C62 50, 106 42, 148 48 C170 51, 182 60, 188 72 C182 84, 170 93, 148 96 C106 102, 62 94, 62 72 Z" fill="rgba(255,255,255,0.88)"/>
+<path d="M62 72 L34 50 L43 72 L34 94 Z" fill="rgba(255,255,255,0.88)"/>
+<path d="M112 52 L124 32 L140 48 Z" fill="rgba(255,255,255,0.55)"/>
+<circle cx="168" cy="67" r="4.2" fill="#0a2230"/>
+<path d="M100 96 Q108 106 120 96" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none"/>
+</g>
+<text x="110" y="124" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.5" font-weight="700" fill="rgba(255,255,255,0.92)">${safe(e.k)}</text>
+<text x="110" y="136" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">${safe(e.c)}</text>
+</svg>`;
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  },
+
+  src(e){ return this.data[e.k] || this.placeholder(e); },
+
+  procesar(file, cb){
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 500, maxH = 500;
+        let w = img.width, h = img.height;
+        const r = Math.min(maxW/w, maxH/h, 1);
+        w = Math.round(w*r); h = Math.round(h*r);
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#0a2230';
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL('image/jpeg', 0.78));
+      };
+      img.onerror = () => alert('No se pudo leer la imagen: ' + file.name);
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
+  match(fileName){
+    const base = fileName.replace(/\.[^.]+$/,'');
+    const n = norm(base);
+    let hit = ESPECIES.find(e => norm(e.k) === n);
+    if(hit) return hit;
+    hit = ESPECIES.find(e => norm(e.c) === n);
+    if(hit) return hit;
+    hit = ESPECIES.find(e => n.includes(norm(e.k)) || norm(e.k).includes(n));
+    if(hit) return hit;
+    hit = ESPECIES.find(e => n.includes(norm(e.c)) || norm(e.c).includes(n));
+    return hit || null;
+  }
+};
+
+function norm(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function hashStr(s){
+  let h = 0; for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) | 0; }
+  return Math.abs(h);
+}
+
+/* =========================================================
+   4. NAVEGACIÓN
+   ========================================================= */
+$$('.tab').forEach(btn => btn.addEventListener('click', () => {
+  $$('.tab').forEach(b => b.classList.remove('active'));
+  $$('.view').forEach(v => v.classList.remove('active'));
+  btn.classList.add('active');
+  $('#view-'+btn.dataset.view).classList.add('active');
+  if(btn.dataset.view === 'resultados') renderResultados();
+  if(btn.dataset.view === 'imagenes')   renderImagenes();
+  if(btn.dataset.view === 'explorar')   renderExplorar();
+}));
+
+/* =========================================================
+   5. RESUMEN
+   ========================================================= */
+function renderResumen(){
+  const top10 = ORDENADAS.slice(0,10);
+  const max = top10[0].t;
+  const bars = top10.map((e,i) => `
+    <div class="bar-row">
+      <div title="${e.c}">${e.c}</div>
+      <div class="bar-track"><div class="bar-fill ${i<2?'gold':''}" style="width:${(e.t/max*100).toFixed(1)}%"></div></div>
+      <div class="bar-val">${fmt(e.t)} t</div>
+    </div>`).join('');
+  const flotaRows = META.flota.map(f => `
+    <tr><td>${f.puerto}</td><td>${f.arte}</td><td class="num">${f.n}</td></tr>`).join('');
+  const conFoto = Imagenes.count();
+
+  $('#view-resumen').innerHTML = `
+    <div class="grid kpis" style="margin-bottom:18px">
+      <div class="card kpi"><div class="lbl">Desembarque total</div><div class="val">${fmt(META.total)} t</div><div class="hint">Octubre 2023 · Santa Elena</div></div>
+      <div class="card kpi"><div class="lbl">Santa Rosa</div><div class="val">${fmt(META.santaRosa)} t</div><div class="hint">${META.pctSantaRosa} % del total</div></div>
+      <div class="card kpi"><div class="lbl">Anconcito</div><div class="val">${fmt(META.anconcito)} t</div><div class="hint">${META.pctAnconcito} % del total</div></div>
+      <div class="card kpi"><div class="lbl">Especies con foto</div><div class="val">${conFoto}<span style="font-size:14px;color:var(--muted)">/${META.especies}</span></div><div class="hint">Biblioteca de imágenes</div></div>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h2>Top 10 especies por volumen</h2>
+        ${bars}
+        <div class="note">Las dos primeras especies (rabijunco y merluza) concentran el <b>74,91 %</b> del desembarque total.</div>
+      </div>
+      <div class="card">
+        <h2>Distribución por puerto</h2>
+        <div class="donut-wrap">
+          <div class="donut"><div class="donut-center"><div><b>${fmt(META.total)}</b><span>TONELADAS</span></div></div></div>
+          <div class="legend">
+            <span><i style="background:var(--accent)"></i>Anconcito · ${META.pctAnconcito} %</span>
+            <span><i style="background:var(--accent2)"></i>Santa Rosa · ${META.pctSantaRosa} %</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div class="card">
+        <h2>Especies destacadas</h2>
+        <div style="font-size:14px;line-height:2">
+          <div>🥇 <b>Rabijunco</b> <i>Hemanthias signifer</i> — 348,89 t <span class="pill gold">45,82 %</span></div>
+          <div>🥈 <b>Merluza</b> <i>Merluccius gayi</i> — 221,51 t <span class="pill">29,09 %</span></div>
+          <div>🥉 <b>Perela</b> <i>Paralabrax humeralis</i> — 70,58 t <span class="pill">9,27 %</span></div>
+          <div>4️⃣ <b>Perela</b> <i>Paralabrax callaensis</i> — 26,90 t <span class="pill">3,53 %</span></div>
+          <div>5️⃣ <b>Corvina de roca</b> <i>Brotula clarkae</i> — 18,39 t <span class="pill">2,42 %</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Flota activa por arte de pesca</h2>
+        <table>
+          <thead><tr><th>Puerto</th><th>Arte de pesca</th><th class="num">N.º</th></tr></thead>
+          <tbody>${flotaRows}</tbody>
+        </table>
+        <div class="note">Todas las embarcaciones registradas fueron de <b>fibra de vidrio</b>. Recurso objetivo: rabijunco, perela, camotillo, rojito, cabezudo, brujo, merluza, mero, lisa, carita, morena y ojo de uva.</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Notas metodológicas</h2>
+      <div style="font-size:13.5px;color:#cfe3ec;line-height:1.9">
+        • Fuente: <b>IPIAP — Reporte Pesquero, Provincia de Santa Elena, octubre 2023</b>.<br>
+        • El texto menciona <b>70 embarcaciones activas</b> en Santa Rosa, mientras que la Tabla 2 detalla 65 (40+15+10).<br>
+        • Los totales por puerto usados son los <b>reportados oficialmente</b> (86,92 t y 674,50 t).<br>
+        • Imágenes: se guardan comprimidas localmente en tu navegador. Si no hay foto, se muestra un placeholder SVG.
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   6. EXPLORADOR
+   ========================================================= */
+let explorarOrden = 't-desc';
+function renderExplorar(){
+  const q = ($('#buscar').value || '').toLowerCase().trim();
+  let lista = ESPECIES.filter(e => e.c.toLowerCase().includes(q) || e.k.toLowerCase().includes(q));
+  const cmp = {
+    't-desc': (x,y)=>y.t-x.t, 't-asc': (x,y)=>x.t-y.t,
+    'c-asc': (x,y)=>x.c.localeCompare(y.c,'es'),
+    'k-asc': (x,y)=>x.k.localeCompare(y.k,'es'),
+    'a-desc': (x,y)=>y.a-x.a, 's-desc': (x,y)=>y.s-x.s
+  }[explorarOrden];
+  lista = [...lista].sort(cmp);
+
+  $('#tbody-especies').innerHTML = lista.map((e,i) => {
+    const has = Imagenes.has(e.k);
+    return `<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td class="thumb-cell"><img src="${Imagenes.src(e)}" alt="${e.c}" loading="lazy" style="${has?'':'opacity:.55'}"></td>
+      <td><b>${e.c}</b></td>
+      <td style="font-style:italic;color:var(--accent)">${e.k}</td>
+      <td class="num">${e.a ? fmt(e.a) : '—'}</td>
+      <td class="num">${e.s ? fmt(e.s) : '—'}</td>
+      <td class="num"><b>${fmt(e.t)}</b></td>
+      <td class="num">${fmt(e.p)} %</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">Sin resultados para «${q}»</td></tr>`;
+
+  $('#nota-explorar').innerHTML = `Mostrando <b>${lista.length}</b> de <b>${ESPECIES.length}</b> especies · <b>${Imagenes.count()}</b> con foto subida.`;
+}
+$('#buscar').addEventListener('input', renderExplorar);
+$('#orden').addEventListener('change', e => { explorarOrden = e.target.value; renderExplorar(); });
+$$('#view-explorar th').forEach((th,i) => {
+  const map = {2:'c-asc',3:'k-asc',4:'a-desc',5:'s-desc',6:'t-desc',7:'t-desc'};
+  th.addEventListener('click', () => { if(map[i]){ explorarOrden = map[i]; $('#orden').value = map[i]; renderExplorar(); }});
+});
+
+/* =========================================================
+   7. TARJETAS
+   ========================================================= */
+const Tarjetas = {
+  deck: [], idx: 0, flipped: false, filtro: 'todas', dir: 'c2k',
+  stats: LS.get('demersales_tarjetas', {}),
+
+  build(){
+    let base;
+    if(this.filtro === 'top10')       base = ORDENADAS.slice(0,10);
+    else if(this.filtro === 'top20')  base = ORDENADAS.slice(0,20);
+    else if(this.filtro === 'con-foto') base = ESPECIES.filter(e => Imagenes.has(e.k));
+    else if(this.filtro === 'falladas') base = ESPECIES.filter(e => (this.stats[e.k]?.fail || 0) > 0);
+    else if(this.filtro === 'nuevas')   base = ESPECIES.filter(e => !this.stats[e.k]);
+    else base = ESPECIES;
+    if(!base.length){ base = ESPECIES; }
+    this.deck = shuffle(base);
+    this.idx = 0; this.flipped = false;
+    this.render();
+  },
+
+  current(){ return this.deck[this.idx]; },
+  flip(){ this.flipped = !this.flipped; this.render(); },
+
+  answer(ok){
+    const e = this.current(); if(!e) return;
+    const s = this.stats[e.k] || {ok:0, fail:0};
+    ok ? s.ok++ : s.fail++;
+    this.stats[e.k] = s;
+    LS.set('demersales_tarjetas', this.stats);
+    this.next();
+  },
+
+  next(){
+    this.flipped = false;
+    this.idx = (this.idx + 1) % this.deck.length;
+    this.render();
+  },
+
+  render(){
+    const e = this.current();
+    const card = $('#flipcard');
+    if(!e){
+      $('#front-main').textContent = 'Sin tarjetas';
+      card.classList.remove('flipped');
+      $('#deck-status').innerHTML = '';
+      return;
+    }
+    card.classList.toggle('flipped', this.flipped);
+    const s = this.stats[e.k] || {ok:0, fail:0};
+    const puertoTop = e.s >= e.a ? 'Santa Rosa' : 'Anconcito';
+    const src = Imagenes.src(e);
+    const esImagen = this.dir === 'i2c' || this.dir === 'i2k';
+
+    $('#front-img').innerHTML = esImagen
+      ? `<img src="${src}" alt="${e.c}">`
+      : `<img src="${src}" alt="${e.c}" style="opacity:.35;filter:blur(0.5px)">`;
+    $('#back-img').innerHTML  = `<img src="${src}" alt="${e.c}">`;
+
+    if(this.dir === 'c2k'){
+      $('#tag-front').textContent = 'Nombre común';
+      $('#front-main').textContent = e.c;
+      $('#front-main').style.fontStyle = 'normal';
+      $('#front-meta').innerHTML = `Desembarque total: <b>${fmt(e.t)} t</b> · ${fmt(e.p)} %`;
+      $('#back-main').textContent = e.k;
+      $('#back-main').style.fontStyle = 'italic';
+    } else if(this.dir === 'k2c'){
+      $('#tag-front').textContent = 'Nombre científico';
+      $('#front-main').textContent = e.k;
+      $('#front-main').style.fontStyle = 'italic';
+      $('#front-meta').innerHTML = `Desembarque total: <b>${fmt(e.t)} t</b>`;
+      $('#back-main').textContent = e.c;
+      $('#back-main').style.fontStyle = 'normal';
+    } else if(this.dir === 'i2c'){
+      $('#tag-front').textContent = '📷 ¿Qué especie es?';
+      $('#front-main').textContent = '—';
+      $('#front-meta').textContent = 'Identifícala por su imagen';
+      $('#back-main').textContent = e.c;
+      $('#back-main').style.fontStyle = 'normal';
+    } else {
+      $('#tag-front').textContent = '📷 Nombre científico de…';
+      $('#front-main').textContent = '—';
+      $('#front-meta').textContent = 'Identifícala por su imagen';
+      $('#back-main').textContent = e.k;
+      $('#back-main').style.fontStyle = 'italic';
+    }
+
+    const fotoTag = Imagenes.has(e.k)
+      ? `<span class="pill">📷 foto real</span>`
+      : `<span class="pill" style="color:var(--muted);border-color:var(--line)">silueta</span>`;
+
+    $('#back-meta').innerHTML = `
+      <div>${e.c} · <i style="color:var(--accent)">${e.k}</i></div>
+      <div style="margin-top:8px">
+        <span class="pill">Anconcito ${e.a ? fmt(e.a)+' t' : '—'}</span>
+        <span class="pill gold">Santa Rosa ${e.s ? fmt(e.s)+' t' : '—'}</span>
+      </div>
+      <div style="margin-top:8px">${fotoTag} Mayor puerto: <b>${puertoTop}</b></div>`;
+
+    $('#deck-status').innerHTML = `
+      Tarjeta <b>${this.idx+1}</b> de <b>${this.deck.length}</b> ·
+      Acertadas: <b style="color:var(--ok)">${s.ok}</b> ·
+      Falladas: <b style="color:var(--bad)">${s.fail}</b>`;
+  }
+};
+
+$('#flipcard').addEventListener('click', () => Tarjetas.flip());
+$('#mk-flip').addEventListener('click', () => Tarjetas.flip());
+$('#mk-ok').addEventListener('click', () => Tarjetas.answer(true));
+$('#mk-fail').addEventListener('click', () => Tarjetas.answer(false));
+$('#deck').addEventListener('change', e => { Tarjetas.filtro = e.target.value; Tarjetas.build(); });
+$('#dir').addEventListener('change',  e => { Tarjetas.dir = e.target.value; Tarjetas.flipped = false; Tarjetas.render(); });
+$('#reiniciar-tarjetas').addEventListener('click', () => {
+  if(confirm('¿Borrar el progreso de todas las tarjetas?')){
+    Tarjetas.stats = {}; LS.set('demersales_tarjetas', {}); Tarjetas.build();
+  }
+});
+document.addEventListener('keydown', ev => {
+  if(!$('#view-tarjetas').classList.contains('active')) return;
+  if(ev.code === 'Space'){ ev.preventDefault(); Tarjetas.flip(); }
+  if(ev.key === 'ArrowRight') Tarjetas.answer(true);
+  if(ev.key === 'ArrowLeft')  Tarjetas.answer(false);
+});
+
+/* =========================================================
+   8. PESTAÑA IMÁGENES
+   ========================================================= */
+function renderImagenes(){
+  const total = Imagenes.count();
+  $('#img-kpis').innerHTML = `
+    <div class="card kpi"><div class="lbl">Con foto</div><div class="val">${total}</div><div class="hint">especies con imagen real</div></div>
+    <div class="card kpi"><div class="lbl">Sin foto</div><div class="val">${META.especies - total}</div><div class="hint">usan silueta placeholder</div></div>
+    <div class="card kpi"><div class="lbl">Cobertura</div><div class="val">${Math.round(total/META.especies*100)}%</div><div class="hint">del catálogo visual</div></div>
+  `;
+
+  const q = ($('#buscar-img').value || '').toLowerCase().trim();
+  const filtro = $('#filtro-img').value;
+  let lista = ESPECIES.filter(e => e.c.toLowerCase().includes(q) || e.k.toLowerCase().includes(q));
+  if(filtro === 'con') lista = lista.filter(e => Imagenes.has(e.k));
+  else if(filtro === 'sin') lista = lista.filter(e => !Imagenes.has(e.k));
+  else if(filtro === 'top') lista = ORDENADAS.slice(0,15).filter(e => e.c.toLowerCase().includes(q) || e.k.toLowerCase().includes(q));
+
+  $('#img-grid').innerHTML = lista.map(e => {
+    const has = Imagenes.has(e.k);
+    return `<div class="img-card" data-k="${encodeURIComponent(e.k)}">
+      <div class="thumb-wrap">
+        <img class="thumb" src="${Imagenes.src(e)}" alt="${e.c}" loading="lazy">
+        ${has ? '<span class="upload-badge">FOTO</span>' : ''}
+      </div>
+      <div class="body">
+        <div class="nc">${e.c}</div>
+        <div class="nk">${e.k}</div>
+        <div class="mini-stat">${fmt(e.t)} t · ${fmt(e.p)} %</div>
+      </div>
+      <div class="acts">
+        <button class="btn sm" data-accion="subir">📷 ${has?'Cambiar':'Subir'}</button>
+        ${has ? '<button class="btn sm ghost" data-accion="quitar">🗑</button>' : ''}
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty" style="grid-column:1/-1">Sin resultados</div>`;
+
+  $$('#img-grid .img-card').forEach(card => {
+    const k = decodeURIComponent(card.dataset.k);
+    const e = ESPECIES.find(x => x.k === k);
+    const btnSubir = card.querySelector('[data-accion="subir"]');
+    const btnQuitar = card.querySelector('[data-accion="quitar"]');
+
+    if(btnSubir){
+      btnSubir.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*';
+        inp.onchange = () => { if(inp.files[0]) subirUna(e, inp.files[0]); };
+        inp.click();
+      });
+    }
+    if(btnQuitar){
+      btnQuitar.addEventListener('click', ev => {
+        ev.stopPropagation();
+        if(confirm(`¿Quitar la foto de ${e.c}?`)){
+          Imagenes.del(e.k);
+          renderImagenes(); renderExplorar(); renderResumen();
+        }
+      });
+    }
+  });
+}
+
+function subirUna(e, file){
+  Imagenes.procesar(file, dataURL => {
+    Imagenes.set(e.k, dataURL);
+    renderImagenes(); renderExplorar(); renderResumen();
+  });
+}
+
+const dz = $('#drop-zone');
+const inputMasivo = $('#input-masivo');
+dz.addEventListener('click', () => inputMasivo.click());
+dz.addEventListener('dragover', ev => { ev.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', ev => {
+  ev.preventDefault(); dz.classList.remove('over');
+  procesarLote([...ev.dataTransfer.files]);
+});
+inputMasivo.addEventListener('change', () => procesarLote([...inputMasivo.files]));
+
+function procesarLote(files){
+  const imgs = files.filter(f => f.type.startsWith('image/'));
+  if(!imgs.length){ alert('No se detectaron imágenes válidas.'); return; }
+
+  let ok = 0, noMatch = [], pendientes = imgs.length;
+  const terminar = () => {
+    if(--pendientes > 0) return;
+    renderImagenes(); renderExplorar(); renderResumen();
+    let msg = `✅ Se cargaron ${ok} imágenes.`;
+    if(noMatch.length) msg += `\n\n⚠️ No se emparejaron con ninguna especie (${noMatch.length}):\n· ` + noMatch.join('\n· ');
+    alert(msg);
+  };
+
+  imgs.forEach(file => {
+    const e = Imagenes.match(file.name);
+    if(!e){ noMatch.push(file.name); terminar(); return; }
+    Imagenes.procesar(file, dataURL => {
+      Imagenes.set(e.k, dataURL);
+      ok++;
+      terminar();
+    });
+  });
+}
+
+$('#buscar-img').addEventListener('input', renderImagenes);
+$('#filtro-img').addEventListener('change', renderImagenes);
+$('#btn-borrar-todas-img').addEventListener('click', () => {
+  if(confirm('¿Borrar TODAS las fotos subidas? Esta acción no se puede deshacer.')){
+    Imagenes.data = {};
+    LS.set('demersales_imagenes', {});
+    renderImagenes(); renderExplorar(); renderResumen();
+  }
+});
+
+/* =========================================================
+   9. BANCO DE PREGUNTAS
+   ========================================================= */
+function bancoNombres(){
+  const out = [];
+  ESPECIES.filter(e => COMUN_COUNT[e.c] === 1).forEach(e => {
+    const dist = shuffle(ESPECIES.filter(x => x.k !== e.k).map(x => x.k)).slice(0,3);
+    out.push({
+      cat:'Nombres científicos',
+      p:`¿Cuál es el nombre científico de «${e.c}»?`,
+      o: shuffle([e.k, ...dist]), c: e.k,
+      e:`${e.c} → ${e.k} · ${fmt(e.t)} t (${fmt(e.p)} %)`
+    });
+  });
+  ESPECIES.forEach(e => {
+    const dist = shuffle([...new Set(ESPECIES.filter(x => x.c !== e.c).map(x => x.c))]).slice(0,3);
+    out.push({
+      cat:'Nombres científicos',
+      p:`¿Qué nombre común corresponde a «${e.k}»?`,
+      o: shuffle([e.c, ...dist]), c: e.c,
+      e:`${e.k} → ${e.c} · ${fmt(e.t)} t`
+    });
+  });
+  return out;
+}
+
+function bancoImagenes(){
+  return ESPECIES.map(e => {
+    const dist = shuffle([...new Set(ESPECIES.filter(x => x.c !== e.c).map(x => x.c))]).slice(0,3);
+    return {
+      cat:'Identificación visual',
+      p:'¿Qué especie aparece en la imagen?',
+      img: e.k,
+      o: shuffle([e.c, ...dist]),
+      c: e.c,
+      e: `${e.c} · ${e.k} · ${fmt(e.t)} t (${fmt(e.p)} %) · Anconcito ${e.a?fmt(e.a)+' t':'—'} / Santa Rosa ${e.s?fmt(e.s)+' t':'—'}`
+    };
+  });
+}
+
+function construirQuiz(modo, n){
+  let banco;
+  if(modo === 'nombres') banco = bancoNombres();
+  else if(modo === 'datos') banco = [...TRIVIA];
+  else if(modo === 'imagen') banco = bancoImagenes();
+  else banco = [...TRIVIA, ...bancoNombres(), ...bancoImagenes()];
+  return shuffle(banco).slice(0, Math.min(n, banco.length));
+}
+
+/* =========================================================
+   10. MOTOR DEL QUIZ
+   ========================================================= */
+const Quiz = {
+  modo:'mixto', largo:10, preguntas:[], i:0, aciertos:0, errores:[], inicio:0, catStats:{},
+
+  configurar(){
+    $$('#chips-modo .chip').forEach(c => c.addEventListener('click', () => {
+      $$('#chips-modo .chip').forEach(x => x.classList.remove('on'));
+      c.classList.add('on'); this.modo = c.dataset.modo;
+    }));
+    $$('#chips-largo .chip').forEach(c => c.addEventListener('click', () => {
+      $$('#chips-largo .chip').forEach(x => x.classList.remove('on'));
+      c.classList.add('on'); this.largo = +c.dataset.largo;
+    }));
+  },
+
+  iniciar(){
+    this.preguntas = construirQuiz(this.modo, this.largo);
+    this.i = 0; this.aciertos = 0; this.errores = []; this.catStats = {};
+    this.inicio = Date.now();
+    $('#quiz-setup').style.display = 'none';
+    $('#quiz-done').style.display  = 'none';
+    $('#quiz-play').style.display  = 'block';
+    this.pintar();
+  },
+
+  pintar(){
+    const q = this.preguntas[this.i];
+    if(!q) return this.terminar();
+
+    $('#q-counter').textContent = `Pregunta ${this.i+1} / ${this.preguntas.length}`;
+    $('#q-cat').textContent = q.cat;
+    $('#q-score').innerHTML = `✔ ${this.aciertos} &nbsp;·&nbsp; ✘ ${this.errores.length}`;
+    $('#q-bar').style.width = ((this.i)/this.preguntas.length*100)+'%';
+    $('#q-text').textContent = q.p;
+    $('#q-explain').style.display = 'none';
+    $('#btn-next').style.display = 'none';
+
+    if(q.img){
+      const e = ESPECIES.find(x => x.k === q.img);
+      const src = e ? Imagenes.src(e) : '';
+      $('#q-img-wrap').innerHTML = `<img class="q-img" src="${src}" alt="Especie a identificar">`;
+    } else {
+      $('#q-img-wrap').innerHTML = '';
+    }
+
+    $('#q-opts').innerHTML = q.o.map((op,i) => `
+      <button class="opt" data-op="${encodeURIComponent(op)}">
+        <span class="k">${ORDEN[i]}</span><span>${op}</span>
+      </button>`).join('');
+
+    $$('#q-opts .opt').forEach(btn => btn.addEventListener('click', () => {
+      this.responder(decodeURIComponent(btn.dataset.op));
+    }));
+  },
+
+  responder(elegida){
+    const q = this.preguntas[this.i];
+    const correcta = elegida === q.c;
+    if(!this.catStats[q.cat]) this.catStats[q.cat] = {ok:0, total:0};
+    this.catStats[q.cat].total++;
+    if(correcta){ this.aciertos++; this.catStats[q.cat].ok++; }
+    else { this.errores.push({p:q.p, elegida, correcta:q.c, e:q.e}); }
+
+    $$('#q-opts .opt').forEach(btn => {
+      btn.disabled = true;
+      const val = decodeURIComponent(btn.dataset.op);
+      if(val === q.c) btn.classList.add('correct');
+      else if(val === elegida) btn.classList.add('wrong');
+    });
+
+    $('#q-explain').innerHTML = `<b>${correcta ? '✅ ¡Correcto!' : '❌ Incorrecto'}</b> — ${q.e}`;
+    $('#q-explain').style.display = 'block';
+    $('#q-score').innerHTML = `✔ ${this.aciertos} &nbsp;·&nbsp; ✘ ${this.errores.length}`;
+    $('#btn-next').style.display = 'inline-block';
+    $('#btn-next').textContent = (this.i === this.preguntas.length-1) ? 'Ver resultados →' : 'Siguiente →';
+  },
+
+  siguiente(){
+    this.i++;
+    if(this.i >= this.preguntas.length) this.terminar();
+    else this.pintar();
+  },
+
+  terminar(){
+    $('#quiz-play').style.display = 'none';
+    $('#quiz-done').style.display = 'block';
+    $('#q-bar').style.width = '100%';
+
+    const total = this.preguntas.length;
+    const pct = Math.round(this.aciertos/total*100);
+    const seg = Math.round((Date.now()-this.inicio)/1000);
+    const color = pct >= 80 ? 'var(--ok)' : pct >= 60 ? 'var(--accent2)' : 'var(--bad)';
+
+    const intentos = LS.get('demersales_intentos', []);
+    intentos.unshift({ fecha: new Date().toISOString(), modo: this.modo, total, aciertos: this.aciertos, pct, seg, categorias: this.catStats });
+    LS.set('demersales_intentos', intentos.slice(0,50));
+
+    const fallosHTML = this.errores.length ? `
+      <div class="card" style="margin-top:16px;background:rgba(255,107,107,.06)">
+        <h2>Repaso de errores (${this.errores.length})</h2>
+        ${this.errores.map(er => `
+          <div style="padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="font-weight:700;margin-bottom:5px">${er.p}</div>
+            <div style="font-size:13px;color:var(--bad)">Tu respuesta: ${er.elegida}</div>
+            <div style="font-size:13px;color:var(--ok)">Correcta: ${er.correcta}</div>
+            <div style="font-size:12.5px;color:var(--muted);margin-top:4px">${er.e}</div>
+          </div>`).join('')}
+      </div>` : `<div class="note" style="margin-top:16px">🎉 ¡Sin errores! Respondiste todo correctamente.</div>`;
+
+    const catHTML = Object.entries(this.catStats).map(([c,s]) => {
+      const p = Math.round(s.ok/s.total*100);
+      return `<div class="bar-row">
+        <div>${c}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${p}%"></div></div>
+        <div class="bar-val">${s.ok}/${s.total}</div>
+      </div>`;
+    }).join('');
+
+    $('#quiz-done').innerHTML = `
+      <h2>Resultado del quiz</h2>
+      <div class="score-ring" style="background:conic-gradient(${color} ${pct*3.6}deg, rgba(255,255,255,.08) 0deg)">
+        <div class="inner"><div><b style="color:${color}">${pct}%</b><span>${this.aciertos} / ${total} correctas</span></div></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:14px;margin-bottom:6px">
+        Modo: <b style="color:var(--txt)">${this.modo}</b> · Tiempo: <b style="color:var(--txt)">${seg}s</b> ·
+        Promedio: <b style="color:var(--txt)">${(seg/total).toFixed(1)}s</b> por pregunta
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btn-otra">🔁 Otro quiz</button>
+        <button class="btn ghost" id="btn-ver-res">🏆 Ver historial</button>
+      </div>
+      <div style="margin-top:22px">
+        <h3>Desempeño por categoría</h3>
+        ${catHTML}
+      </div>
+      ${fallosHTML}`;
+
+    $('#btn-otra').addEventListener('click', () => {
+      $('#quiz-done').style.display = 'none';
+      $('#quiz-setup').style.display = 'block';
+    });
+    $('#btn-ver-res').addEventListener('click', () => {
+      $$('.tab').forEach(b => b.classList.remove('active'));
+      $$('.view').forEach(v => v.classList.remove('active'));
+      document.querySelector('[data-view="resultados"]').classList.add('active');
+      $('#view-resultados').classList.add('active');
+      renderResultados();
+    });
+  }
+};
+
+$('#btn-iniciar').addEventListener('click', () => Quiz.iniciar());
+$('#btn-next').addEventListener('click', () => Quiz.siguiente());
+$('#btn-abort').addEventListener('click', () => {
+  if(confirm('¿Salir del quiz? Se perderá el progreso de este intento.')){
+    $('#quiz-play').style.display = 'none';
+    $('#quiz-setup').style.display = 'block';
+  }
+});
+Quiz.configurar();
+
+/* =========================================================
+   11. RESULTADOS
+   ========================================================= */
+function renderResultados(){
+  const intentos = LS.get('demersales_intentos', []);
+  const stats = LS.get('demersales_tarjetas', {});
+  const nTarjetas = Object.keys(stats).length;
+  const okTarjetas  = Object.values(stats).reduce((a,s)=>a+s.ok,0);
+  const failTarjetas= Object.values(stats).reduce((a,s)=>a+s.fail,0);
+
+  let html = `<div class="card"><h2>Historial de quizzes</h2>`;
+  if(!intentos.length){
+    html += `<div class="empty"><span class="big">🎯</span>Aún no has completado ningún quiz.<br>Ve a la pestaña <b>Quiz</b> y pon a prueba lo que sabes.</div>`;
+  } else {
+    const totalQ = intentos.reduce((a,i)=>a+i.total,0);
+    const totalOk = intentos.reduce((a,i)=>a+i.aciertos,0);
+    const precision = Math.round(totalOk/totalQ*100);
+    const mejor = Math.max(...intentos.map(i=>i.pct));
+    const promedio = Math.round(intentos.reduce((a,i)=>a+i.pct,0)/intentos.length);
+    const cats = {};
+    intentos.forEach(it => {
+      Object.entries(it.categorias||{}).forEach(([c,s]) => {
+        if(!cats[c]) cats[c] = {ok:0,total:0};
+        cats[c].ok += s.ok; cats[c].total += s.total;
+      });
+    });
+
+    html += `
+      <div class="grid kpis" style="margin-bottom:20px">
+        <div class="card kpi"><div class="lbl">Intentos</div><div class="val">${intentos.length}</div><div class="hint">quizzes completados</div></div>
+        <div class="card kpi"><div class="lbl">Precisión global</div><div class="val">${precision}%</div><div class="hint">${totalOk} de ${totalQ} preguntas</div></div>
+        <div class="card kpi"><div class="lbl">Mejor puntaje</div><div class="val">${mejor}%</div><div class="hint">promedio ${promedio}%</div></div>
+        <div class="card kpi"><div class="lbl">Tarjetas estudiadas</div><div class="val">${nTarjetas}</div><div class="hint">${okTarjetas} ✓ / ${failTarjetas} ✗</div></div>
+      </div>
+      <h3>Precisión por categoría (acumulada)</h3>
+      ${Object.entries(cats).sort((a,b)=> (b[1].ok/b[1].total) - (a[1].ok/a[1].total)).map(([c,s])=>{
+        const p = Math.round(s.ok/s.total*100);
+        const col = p>=80?'var(--ok)':p>=60?'var(--accent2)':'var(--bad)';
+        return `<div class="bar-row"><div>${c}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${col}"></div></div>
+          <div class="bar-val">${p}%</div></div>`;
+      }).join('')}
+      <h3 style="margin-top:26px">Últimos intentos</h3>
+      ${intentos.map(it => {
+        const cls = it.pct>=80?'g':it.pct>=60?'y':'r';
+        const f = new Date(it.fecha);
+        const fecha = f.toLocaleDateString('es-EC',{day:'2-digit',month:'short'}) + ' ' + f.toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
+        return `<div class="hist-item">
+          <span>${fecha} · modo <b>${it.modo}</b> · ${it.total} preguntas · ${it.seg}s</span>
+          <span><span class="badge ${cls}">${it.pct}% (${it.aciertos}/${it.total})</span></span>
+        </div>`;
+      }).join('')}`;
+  }
+  html += `</div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Progreso de tarjetas por especie</h2>`;
+  const entradas = Object.entries(stats);
+  if(!entradas.length){
+    html += `<div class="empty"><span class="big">🃏</span>Aún no has estudiado ninguna tarjeta.</div>`;
+  } else {
+    const orden = entradas.sort((a,b) => (b[1].fail - a[1].fail) || (b[1].ok - a[1].ok));
+    html += `<div class="tbl-scroll"><table>
+      <thead><tr><th>Especie</th><th class="num">✓ Sabía</th><th class="num">✗ Fallé</th><th class="num">% acierto</th></tr></thead>
+      <tbody>${orden.map(([k,s])=>{
+        const tot = s.ok + s.fail;
+        const p = tot ? Math.round(s.ok/tot*100) : 0;
+        return `<tr><td style="font-style:italic;color:var(--accent)">${k}</td>
+          <td class="num">${s.ok}</td><td class="num">${s.fail}</td>
+          <td class="num" style="color:${p>=70?'var(--ok)':'var(--bad)'}">${p}%</td></tr>`;
+      }).join('')}</tbody></table></div>`;
+  }
+  html += `</div>
+  <div class="btn-row" style="margin-top:20px">
+    <button class="btn ghost" id="btn-borrar">🗑 Borrar historial de quizzes y tarjetas</button>
+  </div>`;
+
+  $('#view-resultados').innerHTML = html;
+
+  const b = $('#btn-borrar');
+  if(b) b.addEventListener('click', () => {
+    if(confirm('¿Borrar historial de quizzes y progreso de tarjetas? (Las fotos se conservan)')){
+      LS.set('demersales_intentos', []);
+      LS.set('demersales_tarjetas', {});
+      Tarjetas.stats = {};
+      renderResultados();
+    }
+  });
+}
+
+/* =========================================================
+   12. INICIALIZACIÓN
+   ========================================================= */
+renderResumen();
+renderExplorar();
+Tarjetas.build();
+renderImagenes();
+renderResultados();
+</script>
+</body>
+</html>
